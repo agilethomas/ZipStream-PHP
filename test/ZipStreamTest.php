@@ -383,4 +383,28 @@ class ZipStreamTest extends TestCase
 
         $zipArch->close();
     }
+
+    public function testCreateArchiveWithFlushOptionSet(): void
+    {
+        [$tmp, $stream] = $this->getTmpFileStream();
+
+        $zip = new ZipStream(null, array(
+            ZipStream::OPTION_OUTPUT_STREAM => $stream,
+            ZipStream::OPTION_FLUSH_OUTPUT => true,
+        ));
+
+        $zip->addFile('sample.txt', 'Sample String Data');
+        $zip->addFile('test/sample.txt', 'More Simple Sample Data');
+
+        $zip->finish();
+        fclose($stream);
+
+        $tmpDir = $this->validateAndExtractZip($tmp);
+
+        $files = $this->getRecursiveFileList($tmpDir);
+        $this->assertEquals(['sample.txt', 'test/sample.txt'], $files);
+
+        $this->assertStringEqualsFile($tmpDir . '/sample.txt', 'Sample String Data');
+        $this->assertStringEqualsFile($tmpDir . '/test/sample.txt', 'More Simple Sample Data');
+    }
 }
