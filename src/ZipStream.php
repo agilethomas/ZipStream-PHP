@@ -80,6 +80,7 @@ class ZipStream {
 	const OPTION_OUTPUT_STREAM        = 'output_stream';
 	const OPTION_CONTENT_TYPE         = 'content_type';
 	const OPTION_CONTENT_DISPOSITION  = 'content_disposition';
+	const OPTION_FLUSH_OUTPUT         = 'flush_output';
 
 	/**
 	 * Global Options
@@ -189,6 +190,7 @@ class ZipStream {
 			self::OPTION_LARGE_FILE_METHOD    => self::METHOD_STORE,
 			self::OPTION_SEND_HTTP_HEADERS    => false,
 			self::OPTION_HTTP_HEADER_CALLBACK => 'header',
+			self::OPTION_FLUSH_OUTPUT         => false,
 		);
 
 		// merge and save options
@@ -885,6 +887,11 @@ class ZipStream {
 		$this->need_headers = false;
 
 		fwrite($this->opt[self::OPTION_OUTPUT_STREAM], $str);
+
+		if ($this->opt[self::OPTION_FLUSH_OUTPUT]) {
+			flush();
+			ob_flush();
+		}
 	}
 
 	/**
